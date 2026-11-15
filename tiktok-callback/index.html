@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="referrer" content="no-referrer">
+  <title>Connexion TikTok</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<main>
+  <h1>Connexion TikTok</h1>
+  <p class="muted">Cette page n'envoie rien : elle affiche seulement l'adresse de ton navigateur.</p>
+
+  <div class="card">
+    <p id="status">Chargement…</p>
+    <div class="url" id="url"></div>
+    <button id="copy" type="button">Copier l'adresse</button>
+    <p class="muted">Puis, dans le terminal :<br>
+    <code>docker compose exec worker python -m app.cli tiktok-auth code "&lt;adresse copiée&gt;"</code></p>
+  </div>
+</main>
+<script>
+  (function () {
+    var href = window.location.href;
+    var params = new URLSearchParams(window.location.search);
+    var status = document.getElementById("status");
+    document.getElementById("url").textContent = href;
+    if (params.get("code")) {
+      status.textContent = "TikTok a accepté. Copie l'adresse ci-dessous.";
+      status.className = "ok";
+    } else if (params.get("error")) {
+      status.textContent = "TikTok a refusé (" + params.get("error") + "). Relance tiktok-auth url.";
+      status.className = "err";
+    } else {
+      status.textContent = "Aucun code dans l'adresse. Lance d'abord tiktok-auth url.";
+    }
+    document.getElementById("copy").addEventListener("click", function () {
+      var btn = this;
+      navigator.clipboard.writeText(href).then(function () {
+        btn.textContent = "Copié ✓";
+      }, function () {
+        btn.textContent = "Sélectionne l'adresse à la main";
+      });
+    });
+  })();
+</script>
+</body>
+</html>
